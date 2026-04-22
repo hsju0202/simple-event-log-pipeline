@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: pod-log-collector
+  namespace: event-pipeline
+spec:
+  selector:
+    matchLabels:
+      app: pod-log-collector
+  template:
+    metadata:
+      labels:
+        app: pod-log-collector
+    spec:
+      containers:
+        - name: pod-log-collector
+          image: simple-event-log-pipeline:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: event-generator-config
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          command:
+            - sh
+            - -lc
+            - |
+              mkdir -p "$OUTPUT_PATH"
+              while true; do
+                find "$LOG_SOURCE_PATH" -type f -name "*.log" -print > "$OUTPUT_PATH/pod-log-files.txt"
+                sleep "$SCAN_INTERVAL_SECONDS"
+              done
+          volumeMounts:
+            - name: pod-logs
+              mountPath: /var/log/pods
+              readOnly: true
+            - name: collector-output
+              mountPath: /var/lib/event-pipeline
+      volumes:
+        - name: pod-logs
+          hostPath:
+            path: /var/log/pods
+            type: Directory
+        - name: collector-output
+          hostPath:
+            path: /var/lib/event-pipeline
+            type: DirectoryOrCreate

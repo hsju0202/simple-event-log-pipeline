@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: event-generator-config
+  namespace: event-pipeline
+data:
+  LOG_SOURCE_PATH: "/var/log/pods"
+  OUTPUT_PATH: "/var/lib/event-pipeline"
+  SCAN_INTERVAL_SECONDS: "60"

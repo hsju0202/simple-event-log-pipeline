@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Event Analytics Dashboard</title>
+  <style>
+    :root {
+      --bg: #e2e8f0;
+      --panel: rgba(248, 250, 252, 0.86);
+      --panel-border: rgba(148, 163, 184, 0.28);
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #0f766e;
+      --accent-2: #2563eb;
+      --danger: #dc2626;
+      --shadow: 0 22px 60px rgba(15, 23, 42, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(14, 165, 233, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(34, 197, 94, 0.16), transparent 24%),
+        linear-gradient(180deg, #eff6ff 0%, #e2e8f0 100%);
+    }
+    .dashboard {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .panel {
+      background: var(--panel);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+    .hero-main {
+      padding: 28px;
+      min-height: 230px;
+      background:
+        linear-gradient(135deg, rgba(15, 118, 110, 0.10), rgba(37, 99, 235, 0.12)),
+        var(--panel);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 4vw, 52px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+    .hero-copy {
+      margin: 16px 0 0;
+      max-width: 620px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+    .hero-side {
+      padding: 24px;
+      display: grid;
+      align-content: center;
+      gap: 18px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.05em;
+    }
+    .stat-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .kpi {
+      padding: 22px;
+      min-height: 138px;
+    }
+    .kpi .value {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      margin-top: 18px;
+    }
+    .kpi .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+    .section-title {
+      margin: 0 0 4px;
+      font-size: 20px;
+      letter-spacing: -0.03em;
+    }
+    .section-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(360px, 0.7fr);
+      gap: 18px;
+    }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    .chart-panel, .table-panel {
+      padding: 20px;
+    }
+    .chart-frame {
+      margin-top: 16px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      background: white;
+    }
+    .chart-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .table-stack {
+      display: grid;
+      gap: 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    }
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+    .danger {
+      color: var(--danger);
+    }
+    @media (max-width: 1080px) {
+      .hero, .content-grid, .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="dashboard">
+    <section class="hero">
+      <article class="panel hero-main">
+        <div class="eyebrow">Event Pipeline Dashboard</div>
+        <h1>Operational Event Analytics</h1>
+        <p class="hero-copy">
+          SQL aggregate results are presented as a lightweight BI-style dashboard with KPI cards,
+          trend panels, and ranked breakdowns. It is generated locally from the current pipeline run.
+        </p>
+      </article>
+      <aside class="panel hero-side">
+        <div>
+          <div class="stat-label">Error Rate</div>
+          <div class="stat-value danger">61.12%</div>
+          <div class="stat-sub">611244 error events across 1000000 total events</div>
+        </div>
+        <div>
+          <div class="stat-label">Peak Hour</div>
+          <div class="stat-value">04-21 02:00</div>
+          <div class="stat-sub">Highest hourly event volume from the SQL time bucket aggregate</div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="kpi-grid">
+      <article class="panel kpi">
+        <div class="stat-label">Total Events</div>
+        <div class="value">1000000</div>
+        <div class="meta">All ingested events included in the aggregate output.</div>
+      </article>
+      <article class="panel kpi">
+        <div class="stat-label">Active Users</div>
+        <div class="value">100</div>
+        <div class="meta">Distinct user rows present in the grouped SQL result.</div>
+      </article>
+      <article class="panel kpi">
+        <div class="stat-label">Event Types</div>
+        <div class="value">4</div>
+        <div class="meta">Categorical breakdown of current event activity.</div>
+      </article>
+      <article class="panel kpi">
+        <div class="stat-label">Healthy Events</div>
+        <div class="value">388756</div>
+        <div class="meta">Events outside client/system error categories.</div>
+      </article>
+    </section>
+
+    <section class="content-grid">
+      <div class="chart-grid">
+        <article class="panel chart-panel">
+          <h2 class="section-title">Volume By Event Type</h2>
+          <p class="section-subtitle">Distribution across page views, purchases, and error categories.</p>
+          <div class="chart-frame">
+            <img src="event_type_counts.svg" alt="Event type counts chart" />
+          </div>
+        </article>
+        <article class="panel chart-panel">
+          <h2 class="section-title">Hourly Trend</h2>
+          <p class="section-subtitle">Time-series view of traffic volume per SQL hour bucket.</p>
+          <div class="chart-frame">
+            <img src="hourly_event_trend.svg" alt="Hourly event trend chart" />
+          </div>
+        </article>
+      </div>
+
+      <div class="table-stack">
+        <article class="panel chart-panel">
+          <h2 class="section-title">User Concentration</h2>
+          <p class="section-subtitle">Top contributors by event volume from grouped user counts.</p>
+          <div class="chart-frame">
+            <img src="user_event_counts.svg" alt="Top users by event count chart" />
+          </div>
+        </article>
+        <article class="panel chart-panel">
+          <h2 class="section-title">Reliability Snapshot</h2>
+          <p class="section-subtitle">Error ratio view derived from the global aggregate query.</p>
+          <div class="chart-frame">
+            <img src="error_rate.svg" alt="Error rate chart" />
+          </div>
+        </article>
+        <article class="panel table-panel">
+          <h2 class="section-title">Top Users Table</h2>
+          <p class="section-subtitle">Compact ranking for quick inspection.</p>
+          <table>
+            <thead>
+              <tr><th>User</th><th>Events</th></tr>
+            </thead>
+            <tbody><tr><td>User 64</td><td>10250</td></tr><tr><td>User 26</td><td>10226</td></tr><tr><td>User 75</td><td>10217</td></tr><tr><td>User 4</td><td>10212</td></tr><tr><td>User 62</td><td>10212</td></tr><tr><td>User 97</td><td>10198</td></tr><tr><td>User 13</td><td>10190</td></tr><tr><td>User 30</td><td>10188</td></tr></tbody>
+          </table>
+        </article>
+        <article class="panel table-panel">
+          <h2 class="section-title">Event Type Table</h2>
+          <p class="section-subtitle">Raw grouped counts behind the category chart.</p>
+          <table>
+            <thead>
+              <tr><th>Event Type</th><th>Events</th></tr>
+            </thead>
+            <tbody><tr><td>system_error</td><td>472265</td></tr><tr><td>page_view</td><td>333034</td></tr><tr><td>client_error</td><td>138979</td></tr><tr><td>purchase</td><td>55722</td></tr></tbody>
+          </table>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
